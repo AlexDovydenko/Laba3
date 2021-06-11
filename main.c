@@ -1,49 +1,49 @@
-# включить  < stdio.h >
-# включить  < stdlib.h >
-# включить  < string.h >
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int  main ( int ac, char * av [])
+int main(int ac, char *av[])
 {
-   char * nameFile;
-   если (ac> 1 ) nameFile = av [ 1 ];
-   еще
+   char *nameFile;
+   if (ac > 1) nameFile = av[1];
+   else
   {
-    printf ( " Имя файла не указано " );
-    возврат  1 ;
+    printf("File name not specified");
+    return 1;
   }
-    ФАЙЛ * fIn = fopen (nameFile, « rb » );
-    ФАЙЛ * fOut = fopen ( " newpicture.bmp " , " wb " );
-    если (! fIn ||! fOut)
+    FILE *fIn = fopen(nameFile, "rb");
+    FILE *fOut = fopen("newpicture.bmp", "wb");
+    if (!fIn || !fOut)
     {
-        printf ( " Ошибка файла. \ n " );
-        возврат  0 ;
+        printf("File error.\n");
+        return 0;
     }
 
-     заголовок беззнакового символа [ 54 ];
-    fread (заголовок, sizeof ( символ без знака  ), 54 , fIn);
-    fwrite (заголовок, sizeof ( символ без знака  ), 54 , fOut);
+    unsigned char header[54];
+    fread(header, sizeof(unsigned char), 54, fIn);
+    fwrite(header, sizeof(unsigned char), 54, fOut);
 
-    int width = * ( int *) и заголовок [ 18 ];
-    int height = abs (* ( int *) и заголовок [ 22 ]);
-    int stride = (ширина * 3 + 3 ) & ~ 3 ;
-    int padding = stride - ширина * 3 ;
+    int width = *(int*)&header[18];
+    int height = abs(*(int*)&header[22]);
+    int stride = (width * 3 + 3) & ~3;
+    int padding = stride - width * 3;
 
-    printf ( « Готово! » );
+    printf("Done!");
 
-    беззнаковый  символ пикселя [ 3 ];
-    для ( int y = 0 ; y <height; ++ y)
+    unsigned char pixel[3];
+    for (int y = 0; y < height; ++y)
     {
-        для ( int x = 0 ; x <width; ++ x)
+        for (int x = 0; x < width; ++x)
         {
-            fread (пиксель, 3 , 1 , fIn);
-             серый символ без знака = пиксель [ 0 ] * 0,3 + пиксель [ 1 ] * 0,58 + пиксель [ 2 ] * 0,11 ;
-            memset (пиксель, серый, размер (пиксель));
-            fwrite (& pixel, 3 , 1 , fOut);
+            fread(pixel, 3, 1, fIn);
+            unsigned char gray = pixel[0] * 0.3 + pixel[1] * 0.58 + pixel[2] * 0.11;
+            memset(pixel, gray, sizeof(pixel));
+            fwrite(&pixel, 3, 1, fOut);
         }
-        fread (пиксель, отступ, 1 , fIn);
-        fwrite (пиксель, отступ, 1 , fOut);
+        fread(pixel, padding, 1, fIn);
+        fwrite(pixel, padding, 1, fOut);
     }
-    fclose (fOut);
-    fclose (fIn);
-    возврат  0 ;
+    fclose(fOut);
+    fclose(fIn);
+    return 0;
 }
